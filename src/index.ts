@@ -25,7 +25,7 @@ connectDb(process.env.MONGO_URL)
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: "https://oauth-frontend-playground.netlify.app/", credentials: true }))
+app.use(cors({ origin: "https://oauth-frontend-playground.netlify.app", credentials: true }))
 
 app.set("trust proxy", 1);
 

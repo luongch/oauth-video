@@ -68,7 +68,7 @@ var connectDb = function (uri) { return __awaiter(void 0, void 0, void 0, functi
 connectDb(process.env.MONGO_URL);
 // Middleware
 app.use(express_1.default.json());
-app.use(cors_1.default({ origin: "https://oauth-frontend-playground.netlify.app/", credentials: true }));
+app.use(cors_1.default({ origin: "https://oauth-frontend-playground.netlify.app", credentials: true }));
 app.set("trust proxy", 1);
 app.use(express_session_1.default({
     secret: "secretcode",
