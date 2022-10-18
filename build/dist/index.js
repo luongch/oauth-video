@@ -68,7 +68,7 @@ var connectDb = function (uri) { return __awaiter(void 0, void 0, void 0, functi
 connectDb(process.env.MONGO_URL);
 // Middleware
 app.use(express_1.default.json());
-app.use(cors_1.default({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors_1.default({ origin: "https://oauth-frontend-playground.netlify.app/", credentials: true }));
 app.set("trust proxy", 1);
 app.use(express_session_1.default({
     secret: "secretcode",
@@ -170,8 +170,8 @@ passport_1.default.use(new GoogleStrategy({
 //   }
 // ));
 app.get('/auth/google', passport_1.default.authenticate('google', { scope: ['profile'] }));
-app.get('/auth/google/callback', passport_1.default.authenticate('google', { failureRedirect: 'http://localhost:3000', session: true }), function (req, res) {
-    res.redirect('http://localhost:3000');
+app.get('/auth/google/callback', passport_1.default.authenticate('google', { failureRedirect: 'https://oauth-frontend-playground.netlify.app/', session: true }), function (req, res) {
+    res.redirect('https://oauth-frontend-playground.netlify.app/');
 });
 // app.get('/auth/twitter', passport.authenticate('twitter'));
 // app.get('/auth/twitter/callback',

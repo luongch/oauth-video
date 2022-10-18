@@ -25,7 +25,7 @@ connectDb(process.env.MONGO_URL)
 
 // Middleware
 app.use(express.json());
-app.use(cors({ origin: "http://localhost:3000", credentials: true }))
+app.use(cors({ origin: "https://oauth-frontend-playground.netlify.app/", credentials: true }))
 
 app.set("trust proxy", 1);
 
@@ -155,9 +155,9 @@ passport.use(new GoogleStrategy({
 app.get('/auth/google', passport.authenticate('google', { scope: ['profile'] }));
 
 app.get('/auth/google/callback',
-  passport.authenticate('google', { failureRedirect: 'http://localhost:3000', session: true }),
+  passport.authenticate('google', { failureRedirect: 'https://oauth-frontend-playground.netlify.app/', session: true }),
   function (req, res) {
-    res.redirect('http://localhost:3000');
+    res.redirect('https://oauth-frontend-playground.netlify.app/');
   });
 
 
