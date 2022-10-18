@@ -47,36 +47,42 @@ var express_session_1 = __importDefault(require("express-session"));
 var passport_1 = __importDefault(require("passport"));
 var User_1 = __importDefault(require("./User"));
 var GoogleStrategy = require('passport-google-oauth20').Strategy;
-var TwitterStrategy = require('passport-twitter').Strategy;
-var GitHubStrategy = require('passport-github').Strategy;
+// const TwitterStrategy = require('passport-twitter').Strategy;
+// const GitHubStrategy = require('passport-github').Strategy;
 dotenv_1.default.config();
 var app = express_1.default();
-mongoose_1.default.connect("" + process.env.START_MONGODB + process.env.MONGODB_USERNAME + ":" + process.env.MONGODB_PASSWORD + process.env.END_MONGODB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}, function () {
-    console.log("Connected to mongoose successfully");
-});
+var connectDb = function (uri) { return __awaiter(void 0, void 0, void 0, function () {
+    var db;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, mongoose_1.default.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })];
+            case 1:
+                _a.sent();
+                db = mongoose_1.default.connection;
+                db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+                console.log('conn ready:  ' + mongoose_1.default.connection.readyState);
+                return [2 /*return*/];
+        }
+    });
+}); };
+connectDb(process.env.MONGO_URL);
 // Middleware
 app.use(express_1.default.json());
-app.use(cors_1.default({ origin: "https://gallant-hodgkin-fb9c52.netlify.app", credentials: true }));
+app.use(cors_1.default({ origin: "http://localhost:3000", credentials: true }));
 app.set("trust proxy", 1);
 app.use(express_session_1.default({
     secret: "secretcode",
     resave: true,
     saveUninitialized: true,
-    cookie: {
-        sameSite: "none",
-        secure: true,
-        maxAge: 1000 * 60 * 60 * 24 * 7 // One Week
-    }
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
 passport_1.default.serializeUser(function (user, done) {
+    console.log("serializeUser");
     return done(null, user._id);
 });
 passport_1.default.deserializeUser(function (id, done) {
+    console.log("deserializeUser");
     User_1.default.findById(id, function (err, doc) {
         // Whatever we return goes to the client and binds to the req.user property
         return done(null, doc);
@@ -88,6 +94,7 @@ passport_1.default.use(new GoogleStrategy({
     callbackURL: "/auth/google/callback"
 }, function (_, __, profile, cb) {
     var _this = this;
+    console.log("in google strat");
     User_1.default.findOne({ googleId: profile.id }, function (err, doc) { return __awaiter(_this, void 0, void 0, function () {
         var newUser;
         return __generator(this, function (_a) {
@@ -113,83 +120,66 @@ passport_1.default.use(new GoogleStrategy({
         });
     }); });
 }));
-passport_1.default.use(new TwitterStrategy({
-    consumerKey: "" + process.env.TWITTER_CLIENT_ID,
-    consumerSecret: "" + process.env.TWITTER_CLIENT_SECRET,
-    callbackURL: "/auth/twitter/callback"
-}, function (_, __, profile, cb) {
-    var _this = this;
-    User_1.default.findOne({ twitterId: profile.id }, function (err, doc) { return __awaiter(_this, void 0, void 0, function () {
-        var newUser;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (err) {
-                        return [2 /*return*/, cb(err, null)];
-                    }
-                    if (!!doc) return [3 /*break*/, 2];
-                    newUser = new User_1.default({
-                        twitterId: profile.id,
-                        username: profile.username
-                    });
-                    return [4 /*yield*/, newUser.save()];
-                case 1:
-                    _a.sent();
-                    cb(null, newUser);
-                    _a.label = 2;
-                case 2:
-                    cb(null, doc);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-}));
-passport_1.default.use(new GitHubStrategy({
-    clientID: "" + process.env.GITHUB_CLIENT_ID,
-    clientSecret: "" + process.env.GITHUB_CLIENT_SECRET,
-    callbackURL: "/auth/github/callback"
-}, function (_, __, profile, cb) {
-    var _this = this;
-    User_1.default.findOne({ githubId: profile.id }, function (err, doc) { return __awaiter(_this, void 0, void 0, function () {
-        var newUser;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    if (err) {
-                        return [2 /*return*/, cb(err, null)];
-                    }
-                    if (!!doc) return [3 /*break*/, 2];
-                    newUser = new User_1.default({
-                        githubId: profile.id,
-                        username: profile.username
-                    });
-                    return [4 /*yield*/, newUser.save()];
-                case 1:
-                    _a.sent();
-                    cb(null, newUser);
-                    _a.label = 2;
-                case 2:
-                    cb(null, doc);
-                    return [2 /*return*/];
-            }
-        });
-    }); });
-}));
+// passport.use(new TwitterStrategy({
+//   consumerKey: `${process.env.TWITTER_CLIENT_ID}`,
+//   consumerSecret: `${process.env.TWITTER_CLIENT_SECRET}`,
+//   callbackURL: "/auth/twitter/callback"
+// },
+//   function (_: any, __: any, profile: any, cb: any) {
+//     User.findOne({ twitterId: profile.id }, async (err: Error, doc: IMongoDBUser) => {
+//       if (err) {
+//         return cb(err, null);
+//       }
+//       if (!doc) {
+//         const newUser = new User({
+//           twitterId: profile.id,
+//           username: profile.username
+//         });
+//         await newUser.save();
+//         cb(null, newUser);
+//       }
+//       cb(null, doc);
+//     })
+//   }
+// ));
+// passport.use(new GitHubStrategy({
+//   clientID: `${process.env.GITHUB_CLIENT_ID}`,
+//   clientSecret: `${process.env.GITHUB_CLIENT_SECRET}`,
+//   callbackURL: "/auth/github/callback"
+// },
+//   function (_: any, __: any, profile: any, cb: any) {
+//     User.findOne({ githubId: profile.id }, async (err: Error, doc: IMongoDBUser) => {
+//       if (err) {
+//         return cb(err, null);
+//       }
+//       if (!doc) {
+//         const newUser = new User({
+//           githubId: profile.id,
+//           username: profile.username
+//         });
+//         await newUser.save();
+//         cb(null, newUser);
+//       }
+//       cb(null, doc);
+//     })
+//   }
+// ));
 app.get('/auth/google', passport_1.default.authenticate('google', { scope: ['profile'] }));
-app.get('/auth/google/callback', passport_1.default.authenticate('google', { failureRedirect: '/login', session: true }), function (req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('https://gallant-hodgkin-fb9c52.netlify.app');
+app.get('/auth/google/callback', passport_1.default.authenticate('google', { failureRedirect: 'http://localhost:3000', session: true }), function (req, res) {
+    res.redirect('http://localhost:3000');
 });
-app.get('/auth/twitter', passport_1.default.authenticate('twitter'));
-app.get('/auth/twitter/callback', passport_1.default.authenticate('twitter', { failureRedirect: '/login', session: true }), function (req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('https://gallant-hodgkin-fb9c52.netlify.app');
-});
-app.get('/auth/github', passport_1.default.authenticate('github'));
-app.get('/auth/github/callback', passport_1.default.authenticate('github', { failureRedirect: '/login', session: true }), function (req, res) {
-    // Successful authentication, redirect home.
-    res.redirect('https://gallant-hodgkin-fb9c52.netlify.app');
-});
+// app.get('/auth/twitter', passport.authenticate('twitter'));
+// app.get('/auth/twitter/callback',
+//   passport.authenticate('twitter', { failureRedirect: 'https://gallant-hodgkin-fb9c52.netlify.app', session: true }),
+//   function (req, res) {
+//     res.redirect('https://gallant-hodgkin-fb9c52.netlify.app');
+//   });
+// app.get('/auth/github', passport.authenticate('github'));
+// app.get('/auth/github/callback',
+//   passport.authenticate('github', { failureRedirect: 'https://gallant-hodgkin-fb9c52.netlify.app', session: true }),
+//   function (req, res) {
+//     res.redirect('https://gallant-hodgkin-fb9c52.netlify.app');
+//   });
 app.get("/", function (req, res) {
     res.send("Helllo WOlrd");
 });
