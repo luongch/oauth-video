@@ -170,8 +170,8 @@ passport_1.default.use(new GoogleStrategy({
 //   }
 // ));
 app.get('/auth/google', passport_1.default.authenticate('google', { scope: ['profile'] }));
-app.get('/auth/google/callback', passport_1.default.authenticate('google', { failureRedirect: 'https://oauth-frontend-playground.netlify.app/', session: true }), function (req, res) {
-    res.redirect('https://oauth-frontend-playground.netlify.app/');
+app.get('/auth/google/callback', passport_1.default.authenticate('google', { failureRedirect: 'https://oauth-frontend-playground.netlify.app', session: true }), function (req, res) {
+    res.redirect('https://oauth-frontend-playground.netlify.app');
 });
 // app.get('/auth/twitter', passport.authenticate('twitter'));
 // app.get('/auth/twitter/callback',
