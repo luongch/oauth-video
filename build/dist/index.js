@@ -74,6 +74,11 @@ app.use(express_session_1.default({
     secret: "secretcode",
     resave: true,
     saveUninitialized: true,
+    cookie: {
+        sameSite: "none",
+        secure: true,
+        maxAge: 1000 * 60 * 60 * 24 * 7 // One Week
+    }
 }));
 app.use(passport_1.default.initialize());
 app.use(passport_1.default.session());
